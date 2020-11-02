@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dialog default_button="true" title="動画情報">
+	<float id="101" label="半径" unit="mm" />
+</dialog>
