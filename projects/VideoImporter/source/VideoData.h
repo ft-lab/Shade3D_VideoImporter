@@ -15,8 +15,13 @@ namespace VideoData {
 	class CVideoData
 	{
 	public:
+		std::string name;				// マスターイメージ名.
 		std::string fileName;			// フルパスのファイル名.
+		int width, height;				// 画像サイズ.
+		int frameCount;					// フレーム総数.
+		float frameRate;				// フレームレート.
 
+		bool playLoop;					// ループ再生.
 
 	public:
 		CVideoData ();
@@ -24,7 +29,14 @@ namespace VideoData {
 		~CVideoData ();
 
 		CVideoData& operator = (const CVideoData &v) {
-			this->fileName  = v.fileName;
+			this->name       = v.name;
+			this->fileName   = v.fileName;
+			this->width      = v.width;
+			this->height     = v.height;
+			this->frameCount = v.frameCount;
+			this->frameRate  = v.frameRate;
+			this->playLoop   = v.playLoop;
+
 			return (*this);
 		}
 

@@ -34,6 +34,7 @@ void StreamCtrl::saveVideoData (sxsdk::shape_class& shape, const VideoData::CVid
 		stream->set_pointer(0);
 		stream->set_size(0);
 
+		int iDat;
 		int iVersion = SHAPE_VIDEO_DATA_STREAM_VERSION;
 		stream->write_int(iVersion);
 
@@ -41,6 +42,9 @@ void StreamCtrl::saveVideoData (sxsdk::shape_class& shape, const VideoData::CVid
 		memset(szStr, 0, 510);
 		sprintf(szStr, "%s", data.fileName.c_str());
 		stream->write(510, szStr);
+
+		iDat = data.playLoop ? 1 : 0;
+		stream->write_int(iDat);
 
 		stream->set_label("[Video]");
 	} catch (...) { }
@@ -58,12 +62,16 @@ bool StreamCtrl::loadVideoData (sxsdk::shape_class& shape, VideoData::CVideoData
 		if (!stream) return false;
 		stream->set_pointer(0);
 
+		int iDat;
 		int iVersion;
 		stream->read_int(iVersion);
 
 		char szStr[512];
 		stream->read(510, szStr);
 		data.fileName = std::string(szStr);
+
+		stream->read_int(iDat);
+		data.playLoop = iDat ? true : false;
 
 		return true;
 

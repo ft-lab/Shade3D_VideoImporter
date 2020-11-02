@@ -4,8 +4,17 @@
 #include "VideoImageAttributeInterface.h"
 #include "ImportVideoWithOpenCV.h"
 #include "StreamCtrl.h"
-#include "VideoData.h"
 #include "Shade3DUtil.h"
+
+enum {
+	dlg_info_image_name = 101,						// イメージ名.
+	dlg_info_file_path = 102,						// ファイルパス.
+	dlg_info_size = 103,							// サイズ.
+	dlg_info_frame_count = 104,						// フレーム総数.
+	dlg_info_frame_rate = 105,						// フレームレート.
+
+	dlg_loop = 201,									// ループ再生.
+};
 
 CVideoImageAttributeInterface::CVideoImageAttributeInterface (sxsdk::shade_interface& shade) : shade(shade)
 {
@@ -20,54 +29,38 @@ CVideoImageAttributeInterface::~CVideoImageAttributeInterface ()
 
 bool CVideoImageAttributeInterface::ask_shape (sxsdk::shape_class &shape, void *)
 {
-	m_outputVideoInfo(shape);
-	return true;
-}
-
-/**
- * 動画情報をメッセージウィンドウに表示.
- */
-void CVideoImageAttributeInterface::m_outputVideoInfo (sxsdk::shape_class& shape)
-{
-	if (shape.get_type() != sxsdk::enums::master_image) {
-		shade.message(shade.gettext("msg_not_master_image"));
-		return;
-	}
-
-	// 動画情報を取得.
-	VideoData::CVideoData videoD;
-	if (!StreamCtrl::loadVideoData(shape, videoD)) {
+	// マスターイメージに割り当てられた属性を取得.
+	if (!StreamCtrl::loadVideoData(shape, m_data)) {
 		shade.message(shade.gettext("msg_not_video_attribute"));
-		return;
+		return false;
 	}
+
+	compointer<sxsdk::dialog_interface> dlg(shade.create_dialog_interface_with_uuid(VIDEO_IMAGE_ATTRIBUTE_ID));
+	dlg->set_resource_name("video_info_dlg");
+	dlg->set_responder(this);
+	this->AddRef();
+
+	m_data.name = std::string(shape.get_name());
 
 	// 動画情報をOpenCV経由で読み込み.
 	CImportVideoWithOpenCV importVideo(shade);
-	if (importVideo.init(videoD.fileName, false)) {
-		const int width      = importVideo.getWidth();
-		const int height     = importVideo.getHeight();
-		const int frameCount = importVideo.getFrameCount();
-		const float fps      = (float)importVideo.getFPS();
-
-		char szStr[512];
-		sprintf(szStr, "[%s]", shape.get_name());
-		shade.message(szStr);
-
-		sprintf(szStr, "  %s", videoD.fileName.c_str());
-		shade.message(szStr);
-
-		sprintf(szStr, "  %d x %d", width, height);
-		shade.message(szStr);
-
-		sprintf(szStr, "  %d frames", frameCount);
-		shade.message(szStr);
-
-		sprintf(szStr, "  %.4f fps", fps);
-		shade.message(szStr);
-
-		shade.message("");
+	if (importVideo.init(m_data.fileName, false)) {
+		m_data.width      = importVideo.getWidth();
+		m_data.height     = importVideo.getHeight();
+		m_data.frameCount = importVideo.getFrameCount();
+		m_data.frameRate  = (float)importVideo.getFPS();
+	} else {
+		shade.message(shade.gettext("msg_not_exist_file"));
+		return false;
 	}
+
+	if (dlg->ask()) {
+		StreamCtrl::saveVideoData(shape, m_data);
+	}
+
+	return true;
 }
+
 
 /**
  * コンテキストメニューでのディム指定.
@@ -183,6 +176,7 @@ void CVideoImageAttributeInterface::m_storeVideoMasterImage (sxsdk::scene_interf
 				delete m_videoList[m_videoList.size() - 1];
 				m_videoList[m_videoList.size() - 1] = NULL;
 			}
+			importVideo->setLoop(videoD.playLoop);
 			importVideo->pMasterImage = pS;
 		}
 	}
@@ -245,3 +239,71 @@ void CVideoImageAttributeInterface::m_updateFirstImage ()
 		image->update();
 	}
 }
+
+/**
+ * ダイアログの初期化.
+ */
+void CVideoImageAttributeInterface::initialize_dialog (sxsdk::dialog_interface &d, void *)
+{
+
+}
+
+/** 
+ * ダイアログのイベントを受け取る.
+ */
+bool CVideoImageAttributeInterface::respond (sxsdk::dialog_interface &d, sxsdk::dialog_item_class &item, int action, void *)
+{
+	const int id = item.get_id();		// アクションがあったダイアログアイテムのID.
+
+	if (id == dlg_loop) {
+		m_data.playLoop = item.get_bool();
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * ダイアログのデータを設定する.
+ */
+void CVideoImageAttributeInterface::load_dialog_data (sxsdk::dialog_interface &d, void *)
+{
+	{
+		sxsdk::dialog_item_class* item;
+		item = &(d.get_dialog_item(dlg_loop));
+		item->set_bool(m_data.playLoop);
+	}
+
+	{
+		sxsdk::dialog_item_class* item;
+		item = &(d.get_dialog_item(dlg_info_image_name));
+		item->set_text(m_data.name.c_str());
+	}
+	{
+		sxsdk::dialog_item_class* item;
+		item = &(d.get_dialog_item(dlg_info_file_path));
+		item->set_text(m_data.fileName.c_str());
+	}
+	{
+		sxsdk::dialog_item_class* item;
+		item = &(d.get_dialog_item(dlg_info_size));
+		char szStr[256];
+		sprintf(szStr, "%d x %d", m_data.width, m_data.height);
+		item->set_text(szStr);
+	}
+	{
+		sxsdk::dialog_item_class* item;
+		item = &(d.get_dialog_item(dlg_info_frame_count));
+		char szStr[256];
+		sprintf(szStr, "%d", m_data.frameCount);
+		item->set_text(szStr);
+	}
+	{
+		sxsdk::dialog_item_class* item;
+		item = &(d.get_dialog_item(dlg_info_frame_rate));
+		char szStr[256];
+		sprintf(szStr, "%.3f", m_data.frameRate);
+		item->set_text(szStr);
+	}
+}
+

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<dialog default_button="false" title="動画情報">
+<dialog default_button="true" title="動画情報">
 	<group label="動画情報">
 		<long-text id="101" label="イメージ名 : " editable="false" short_text="true" lines="1" />
 		<long-text id="102" label="ファイルパス : " editable="false" lines="5" />
@@ -9,5 +9,4 @@
 	</group>
 
 	<bool id="201" label="ループ再生" />
-	<push-button id="202" label="変更 ..." />
 </dialog>

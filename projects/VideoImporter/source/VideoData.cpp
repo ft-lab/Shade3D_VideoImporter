@@ -13,7 +13,13 @@ CVideoData::CVideoData ()
 
 CVideoData::CVideoData (const CVideoData& v)
 {
-	this->fileName  = v.fileName;
+	this->name       = v.name;
+	this->fileName   = v.fileName;
+	this->width      = v.width;
+	this->height     = v.height;
+	this->frameCount = v.frameCount;
+	this->frameRate  = v.frameRate;
+	this->playLoop   = v.playLoop;
 }
 
 CVideoData::~CVideoData ()
@@ -22,6 +28,10 @@ CVideoData::~CVideoData ()
 
 void CVideoData::clear ()
 {
+	name = "";
 	fileName = "";
+	width = height = 0;
+	frameCount = 0;
+	frameRate = 0.0f;
+	playLoop = false;
 }
-

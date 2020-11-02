@@ -7,6 +7,7 @@
 
 #include "GlobalHeader.h"
 #include "ImportVideoWithOpenCV.h"
+#include "VideoData.h"
 
 #include <memory>
 
@@ -17,6 +18,8 @@ private:
 
 	// 動画の再生用.
 	std::vector<CImportVideoWithOpenCV *> m_videoList;
+
+	VideoData::CVideoData m_data;	// 動画情報.
 
 	bool m_renderingF;			// レンダリング中の場合はtrue.
 	sxsdk::rendering_context_interface* m_RC;
@@ -61,12 +64,25 @@ private:
 	 */
 	virtual void idle_task (bool &b, sxsdk::scene_interface *scene, void *aux=0);
 
-private:
+	//--------------------------------------------------.
+	//  ダイアログのイベント処理用.
+	//--------------------------------------------------.
 	/**
-	 * 動画情報をメッセージウィンドウに表示.
+	 * ダイアログの初期化.
 	 */
-	void m_outputVideoInfo (sxsdk::shape_class& shape);
+	virtual void initialize_dialog (sxsdk::dialog_interface &d, void * = 0);
 
+	/** 
+	 * ダイアログのイベントを受け取る.
+	 */
+	virtual bool respond (sxsdk::dialog_interface &d, sxsdk::dialog_item_class &item, int action, void * = 0);
+
+	/**
+	 * ダイアログのデータを設定する.
+	 */
+	virtual void load_dialog_data (sxsdk::dialog_interface &d, void * = 0);
+
+private:
 	/**
 	 * m_videoListをクリア.
 	 */

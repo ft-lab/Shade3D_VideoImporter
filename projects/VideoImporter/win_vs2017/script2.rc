@@ -29,6 +29,7 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
 TEXT                    SXUL                    "..\\source\\resources\\ja.lproj\\sxuls\\text.sxul"
 STRINGS                 SXUL                    "..\\source\\resources\\ja.lproj\\sxuls\\strings.sxul"
+VIDEO_INFO_DLG          SXUL                    "..\\source\\resources\\ja.lproj\\sxuls\\video_info_dlg.sxul"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -36,8 +37,8 @@ STRINGS                 SXUL                    "..\\source\\resources\\ja.lproj
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,0,0,1
- PRODUCTVERSION 0,0,0,1
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -52,13 +53,13 @@ BEGIN
     BEGIN
         BLOCK "041104b0"
         BEGIN
-            VALUE "CompanyName", "Shade3D Co., Ltd."
-            VALUE "FileDescription", "HelloShade"
-            VALUE "FileVersion", "0, 0, 0, 1"
-            VALUE "InternalName", "HelloShade"
-            VALUE "LegalCopyright", "Copyright (C) 2015 Shade3D Co., Ltd."
-            VALUE "ProductName", "Shade plugin"
-            VALUE "ProductVersion", "0, 0, 0, 1"
+            VALUE "CompanyName", "ft-lab."
+            VALUE "FileDescription", "Video Importer"
+            VALUE "FileVersion", "1, 0, 0, 0"
+            VALUE "InternalName", "Video Importer"
+            VALUE "LegalCopyright", "Copyright (C) 2020 ft-lab."
+            VALUE "ProductName", "Video Importer"
+            VALUE "ProductVersion", "1, 0, 0, 0"
         END
     END
     BLOCK "VarFileInfo"
@@ -113,6 +114,7 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 
 TEXT                    SXUL                    "..\\source\\resources\\zh_CN.lproj\\sxuls\\text.sxul"
 STRINGS                 SXUL                    "..\\source\\resources\\zh_CN.lproj\\sxuls\\strings.sxul"
+VIDEO_INFO_DLG          SXUL                    "..\\source\\resources\\zh_CN.lproj\\sxuls\\video_info_dlg.sxul"
 
 #endif    // íÜçëåÍ (P.R.C.) resources
 /////////////////////////////////////////////////////////////////////////////
@@ -133,6 +135,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 TEXT                    SXUL                    "..\\source\\resources\\en.lproj\\sxuls\\text.sxul"
+VIDEO_INFO_DLG          SXUL                    "..\\source\\resources\\en.lproj\\sxuls\\video_info_dlg.sxul"
 
 #endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
