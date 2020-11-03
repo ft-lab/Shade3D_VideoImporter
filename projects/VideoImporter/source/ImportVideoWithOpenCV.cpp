@@ -2,6 +2,7 @@
  * 動画ファイルをインポートする.
  */
 #include "ImportVideoWithOpenCV.h"
+#include "StringUtil.h"
 
 // sxsdk::image_interface* の解放処理.
 // 注意点として、compointer<sxsdk::image_interface>で確保した場合は自動で解放されるため、Releaseを呼んではいけない.
@@ -28,6 +29,7 @@ void CImportVideoWithOpenCV::clear ()
 	m_readExit = false;
 	pMasterImage = NULL;
 	m_loop = false;
+	m_fileExtension = "";
 }
 
 /**
@@ -43,6 +45,9 @@ bool CImportVideoWithOpenCV::init (const std::string& fileName, const bool readF
 		m_video.reset();
 		return false;
 	}
+
+	// ファイル拡張子.
+	m_fileExtension = StringUtil::getFileExtension(fileName);
 
 	// 動画のパラメータを取得.
 	m_width      = m_video->get(cv::CAP_PROP_FRAME_WIDTH);

@@ -25,6 +25,9 @@ const char *CVideoImageImporterInterface::get_file_extension (int index, void*)
 {
 	if (index == 0) { return "mp4"; }
 	if (index == 1) { return "webm"; }
+#if _WINDOWS
+	if (index == 2) { return "mov"; }
+#endif
 
 	return NULL;
 }
@@ -33,6 +36,10 @@ const char *CVideoImageImporterInterface::get_file_description (int index, void*
 {
 	if (index == 0) { return "mp4"; }
 	if (index == 1) { return "webm"; }
+#if _WINDOWS
+	if (index == 2) { return "mov"; }
+#endif
+
 	return NULL;
 }
 

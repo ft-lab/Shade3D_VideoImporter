@@ -9,6 +9,8 @@
 #include "opencv2/videoio.hpp"
 #include "opencv2/core.hpp"
 
+#include <string>
+
 class CImportVideoWithOpenCV
 {
 private:
@@ -20,6 +22,8 @@ private:
 	double m_fps;										// FPS.
 	int m_currentFrame;									// 読み込んだフレーム数.
 	bool m_loop;										// ループ再生を行う場合.
+
+	std::string m_fileExtension;						// ファイル拡張子 (小文字).
 
 	sxsdk::image_interface* m_image;					// 読み込んだ画像を保持.
 

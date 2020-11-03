@@ -34,6 +34,9 @@
     <ClCompile Include="..\source\VideoImageAttributeInterface.cpp">
       <Filter>mysources</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\StringUtil.cpp">
+      <Filter>mysources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -59,6 +62,9 @@
       <Filter>mysources</Filter>
     </ClInclude>
     <ClInclude Include="..\source\VideoImageAttributeInterface.h">
+      <Filter>mysources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\StringUtil.h">
       <Filter>mysources</Filter>
     </ClInclude>
   </ItemGroup>
