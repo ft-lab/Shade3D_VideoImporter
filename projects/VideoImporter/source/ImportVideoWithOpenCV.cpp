@@ -29,6 +29,7 @@ void CImportVideoWithOpenCV::clear ()
 	m_readExit = false;
 	pMasterImage = NULL;
 	m_loop = false;
+	m_filePath = "";
 	m_fileExtension = "";
 }
 
@@ -40,10 +41,37 @@ bool CImportVideoWithOpenCV::init (const std::string& fileName, const bool readF
 {
 	clear();
 	m_video.reset(new cv::VideoCapture());
-	m_video->open(fileName);
+
+	m_filePath = fileName;
+	m_video->open(m_filePath);
 	if (m_video->isOpened() == false) {
-		m_video.reset();
-		return false;
+		try {
+			// Shade3Dのシーンが保存されているフォルダ内に、動画ファイルがあるかチェック.
+			compointer<sxsdk::scene_interface> scene(shade.get_scene_interface());
+			if (scene) {
+				const std::string shdFilePath(scene->get_file_path());
+				if (shdFilePath == "") {
+					m_video.reset();
+					m_filePath = "";
+					return false;
+				}
+				const std::string videoFileName = StringUtil::getFileName(fileName);
+				const std::string shdDir = StringUtil::getFileDir(shdFilePath);
+#if _WINDOWS
+				m_filePath = shdDir + "\\" + videoFileName;
+#else
+				m_filePath = shdDir + "/" + videoFileName;
+#endif
+				m_video->open(m_filePath);
+				if (m_video->isOpened() == false) {
+					m_video.reset();
+					m_filePath = "";
+					return false;
+				}
+			}
+		} catch (...) {
+			return false;
+		}
 	}
 
 	// ファイル拡張子.

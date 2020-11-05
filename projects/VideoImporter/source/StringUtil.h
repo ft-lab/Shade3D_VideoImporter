@@ -59,6 +59,13 @@ namespace StringUtil
 	 */
 	int convUTF8ToSJIS (const std::string& utf8Str, std::string& sjisStr);
 
+	/**
+	 * 文字列が指定の長さ以上の場合に改行コードを入れて折り返す.
+	 * @param[in] srcStr      文字列.
+	 * @param[in] lineLength  折り返しの長さ.
+	 * @param[in] wrapSeparator  区切り文字で折り返し(/または\\).
+	 */
+	std::string convWrapString (const std::string& srcStr, const int lineLength, const bool wrapSeparator = true);
 }
 
 #endif

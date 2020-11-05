@@ -175,3 +175,68 @@ int StringUtil::convUTF8ToSJIS (const std::string& utf8Str, std::string& sjisStr
 		return sjisStr.length();
 #endif
 }
+
+/**
+ * 文字列が指定の長さ以上の場合に改行コードを入れて折り返す.
+ * @param[in] srcStr      文字列.
+ * @param[in] lineLength  折り返しの長さ.
+ * @param[in] wrapSeparator  区切り文字で折り返し(/または\\).
+ */
+std::string StringUtil::convWrapString (const std::string& srcStr, const int lineLength, const bool wrapSeparator)
+{
+	std::string retStr = "";
+	const int sLen = (int)srcStr.length();
+	if (sLen <= lineLength) return srcStr;
+
+	if (wrapSeparator) {
+		std::string str2 = srcStr;
+		std::string str3 = "";
+		while ((int)str2.length() > lineLength) {
+			int pos1 = str2.find_first_of("/");
+			int pos2 = str2.find_first_of("\\");
+
+			if (pos1 != std::string::npos && pos2 != std::string::npos) {
+				pos1 = std::min(pos1, pos2);
+			} else if (pos2 != std::string::npos) {
+				pos1 = pos2;
+			}
+			if (pos1 == std::string::npos) {
+				if (str3 != "") {
+					retStr += str3 + std::string("\n");
+					str3 = "";
+				}
+
+				retStr += str3 + str2.substr(0, lineLength) + std::string("\n");
+				str2 = str2.substr(lineLength);
+				str3 = "";
+				continue;
+			}
+			if (str3.length() + pos1 > lineLength) {
+				if (str3 != "") {
+					retStr += str3 + std::string("\n");
+					str3 = "";
+				}
+			}
+
+			str3 += str2.substr(0, pos1 + 1);
+			str2 = str2.substr(pos1 + 1);
+		}
+		if ((str3 + str2).length() > lineLength) {
+			retStr += str3 + std::string("\n");
+			str3 = "";
+		}
+
+		str2 = str3 + str2;
+		if (str2 != "") retStr += str2;
+
+	} else {
+		std::string str2 = srcStr;
+		while ((int)str2.length() > lineLength) {
+			retStr += str2.substr(0, lineLength) + std::string("\n");
+			str2 = str2.substr(lineLength);
+		}
+		if (str2 != "") retStr += str2;
+	}
+
+	return retStr;
+}

@@ -5,6 +5,7 @@
 #include "ImportVideoWithOpenCV.h"
 #include "StreamCtrl.h"
 #include "Shade3DUtil.h"
+#include "StringUtil.h"
 
 enum {
 	dlg_info_image_name = 101,						// イメージ名.
@@ -29,6 +30,12 @@ CVideoImageAttributeInterface::~CVideoImageAttributeInterface ()
 
 bool CVideoImageAttributeInterface::ask_shape (sxsdk::shape_class &shape, void *)
 {
+	// マスターイメージかどうか.
+	if (shape.get_type() != sxsdk::enums::master_image) {
+		shade.message(shade.gettext("msg_not_master_image"));
+		return false;
+	}
+
 	// マスターイメージに割り当てられた属性を取得.
 	if (!StreamCtrl::loadVideoData(shape, m_data)) {
 		shade.message(shade.gettext("msg_not_video_attribute"));
@@ -45,12 +52,35 @@ bool CVideoImageAttributeInterface::ask_shape (sxsdk::shape_class &shape, void *
 	// 動画情報をOpenCV経由で読み込み.
 	CImportVideoWithOpenCV importVideo(shade);
 	if (importVideo.init(m_data.fileName, false)) {
+		m_data.fileName   = importVideo.getFilePath();
 		m_data.width      = importVideo.getWidth();
 		m_data.height     = importVideo.getHeight();
 		m_data.frameCount = importVideo.getFrameCount();
 		m_data.frameRate  = (float)importVideo.getFPS();
+		
+		// すでに指定されているマスターイメージとサイズが異なる場合は、古いイメージを消して入れ替え.
+		sxsdk::master_image_class& masterImage = shape.get_master_image();
+		sxsdk::image_interface* sImage = masterImage.get_image();
+		if (sImage && (sImage->get_size().x != m_data.width || sImage->get_size().y != m_data.height)) {
+			sImage->Release();
+			sImage = NULL;
+		}
+		if (!sImage) {
+			sxsdk::image_interface* firstImage = importVideo.getFirstImage();
+			compointer<sxsdk::image_interface> dImage(firstImage->duplicate_image());
+			dImage->AddRef();
+			masterImage.set_image(dImage);
+
+			const std::string name = StringUtil::getFileName(m_data.fileName);
+			masterImage.set_name(name.c_str());
+
+			StreamCtrl::saveVideoData(shape, m_data);
+		}
+
 	} else {
-		shade.message(shade.gettext("msg_not_exist_file"));
+		std::string msgStr = std::string("[ ") + m_data.fileName + std::string(" ]\n");
+		msgStr += shade.gettext("msg_not_exist_file");
+		shade.show_message_box(msgStr.c_str(), false);
 		return false;
 	}
 
@@ -174,10 +204,22 @@ void CVideoImageAttributeInterface::m_storeVideoMasterImage (sxsdk::scene_interf
 			CImportVideoWithOpenCV* importVideo = m_videoList.back();
 			if (!importVideo->init(videoD.fileName)) {
 				delete m_videoList[m_videoList.size() - 1];
-				m_videoList[m_videoList.size() - 1] = NULL;
+				m_videoList.pop_back();
+			} else {
+				importVideo->setLoop(videoD.playLoop);
+				importVideo->pMasterImage = pS;
+
+				const int vWidth  = importVideo->getWidth();
+				const int vHeight = importVideo->getHeight();
+
+				// すでに指定されているマスターイメージとサイズが異なる場合は更新をスキップ.
+				sxsdk::master_image_class& masterImage = pS->get_master_image();
+				sxsdk::image_interface* sImage = masterImage.get_image();
+				if (sImage && (sImage->get_size().x != vWidth || sImage->get_size().y != vHeight)) {
+					delete m_videoList[m_videoList.size() - 1];
+					m_videoList.pop_back();
+				}
 			}
-			importVideo->setLoop(videoD.playLoop);
-			importVideo->pMasterImage = pS;
 		}
 	}
 }
@@ -282,7 +324,10 @@ void CVideoImageAttributeInterface::load_dialog_data (sxsdk::dialog_interface &d
 	{
 		sxsdk::dialog_item_class* item;
 		item = &(d.get_dialog_item(dlg_info_file_path));
-		item->set_text(m_data.fileName.c_str());
+
+		// 折り返して表示.
+		const std::string filePathWrap = StringUtil::convWrapString(m_data.fileName, 40);
+		item->set_text(filePathWrap.c_str());
 	}
 	{
 		sxsdk::dialog_item_class* item;
