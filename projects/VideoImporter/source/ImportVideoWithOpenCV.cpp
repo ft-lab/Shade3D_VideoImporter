@@ -107,10 +107,23 @@ bool CImportVideoWithOpenCV::m_storeImage ()
 	if (m_video->isOpened() == false) return false;
 
 	// ループ再生時は、はじめのフレームに戻る.
-	const int curFramePos = m_video->get(cv::CAP_PROP_POS_FRAMES);
+	// 途中のフレームでも「(*m_video) >> cvImage」が失敗する場合がある.
+	// そのため、実際の取り出しフレームとの同期を取っている.
+	const int curFramePos  = m_video->get(cv::CAP_PROP_POS_FRAMES);
+	const int curFramePos2 = (m_videoData.playLoop) ? (m_currentFrame % m_frameCount) : std::min(m_currentFrame, m_frameCount - 1);
+	if (curFramePos != curFramePos2) {
+		m_video->set(cv::CAP_PROP_POS_FRAMES, curFramePos2);
+	}
+
 	if (m_videoData.playLoop) {
 		if (curFramePos + 1 >= m_frameCount) {
 			m_video->set(cv::CAP_PROP_POS_FRAMES, 0);
+		}
+	} else {
+		if (m_currentFrame >= m_frameCount) {
+			if (curFramePos != m_frameCount - 1) {
+				m_video->set(cv::CAP_PROP_POS_FRAMES, m_frameCount - 1);
+			}
 		}
 	}
 
@@ -237,6 +250,24 @@ sxsdk::image_interface* CImportVideoWithOpenCV::readImage (const float frame, co
 			if (m_videoData.startFrame <= m_videoData.endFrame) {
 				if (frame > m_videoData.endFrame) return m_image;
 			}
+		}
+	}
+
+	// 動画のフレーム位置のm_currentFrameが指定のframe値よりも小さい場合は、.
+	// 動画側のフレーム位置を更新.
+	{
+		const float rSec = (float)((frame - m_videoData.startFrame) / fps);
+		const int targetFrame = (int)(rSec * m_fps);
+		if (targetFrame - 3 > m_currentFrame) {
+			m_currentFrame = targetFrame - 1;
+
+			int newFramePos = 0;
+			if (!m_videoData.playLoop) {
+				newFramePos = std::min(m_frameCount - 1, m_currentFrame);
+			} else {
+				newFramePos = m_currentFrame % m_frameCount;
+			}
+			m_video->set(cv::CAP_PROP_POS_FRAMES, newFramePos);
 		}
 	}
 
