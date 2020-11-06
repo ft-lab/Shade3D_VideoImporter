@@ -208,18 +208,34 @@ sxsdk::image_interface* CImportVideoWithOpenCV::readImage (const float frame, co
 	if (updateF) *updateF = false;
 	if (m_readExit) return m_image;
 
-	// 開始フレームよりも小さい場合は指定色で塗りつぶす.
-	if (frame < m_videoData.startFrame) {
-		m_fillImage(m_videoData.color);
-		return m_image;
-	}
+	if (m_videoData.useColor) {
+		// 開始フレームよりも小さい場合は指定色で塗りつぶす.
+		if (frame < m_videoData.startFrame) {
+			m_fillImage(m_videoData.color);
+			return m_image;
+		}
 
-	// 終了フレームよりも大きい場合は指定色で塗りつぶす.
-	if (m_videoData.useEndFrame) {
-		if (m_videoData.startFrame <= m_videoData.endFrame) {
-			if (frame > m_videoData.endFrame) {
-				m_fillImage(m_videoData.color);
-				return m_image;
+		// 終了フレームよりも大きい場合は指定色で塗りつぶす.
+		if (m_videoData.useEndFrame) {
+			if (m_videoData.startFrame <= m_videoData.endFrame) {
+				if (frame > m_videoData.endFrame) {
+					m_fillImage(m_videoData.color);
+					return m_image;
+				}
+			}
+		}
+	} else {
+		if (frame < m_videoData.startFrame) {
+			if (!m_image) {
+				m_storeImage();
+				if (updateF) *updateF = true;
+			}
+			return m_image;
+		}
+
+		if (m_videoData.useEndFrame) {
+			if (m_videoData.startFrame <= m_videoData.endFrame) {
+				if (frame > m_videoData.endFrame) return m_image;
 			}
 		}
 	}

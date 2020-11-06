@@ -31,6 +31,9 @@ void StreamCtrl::saveVideoData (sxsdk::shape_class& shape, const VideoData::CVid
 		iDat = data.playLoop ? 1 : 0;
 		stream->write_int(iDat);
 
+		iDat = data.useColor ? 1 : 0;
+		stream->write_int(iDat);
+
 		iDat = data.useEndFrame ? 1 : 0;
 		stream->write_int(iDat);
 
@@ -66,6 +69,9 @@ bool StreamCtrl::loadVideoData (sxsdk::shape_class& shape, VideoData::CVideoData
 
 		stream->read_int(iDat);
 		data.playLoop = iDat ? true : false;
+
+		stream->read_int(iDat);
+		data.useColor = iDat ? true : false;
 
 		stream->read_int(iDat);
 		data.useEndFrame = iDat ? true : false;

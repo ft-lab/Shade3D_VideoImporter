@@ -10,10 +10,11 @@
 
 	<group label="オプション">
 		<bool id="201" label="ループ再生" />
-		<rgb id="202" label="動画を再生しないときの色" />
-		<float id="203" label="開始フレーム" />
-		<bool id="204" label="終了フレームを使用" />
-		<float id="205" label="終了フレーム" />
+		<bool id="202" label="動画を再生しないフレームで色を指定" />
+		<rgb id="203" label="色" />
+		<float id="204" label="開始フレーム" />
+		<bool id="205" label="終了フレームを使用" />
+		<float id="206" label="終了フレーム" />
 	</group>
 
 	<push-button id="302" label="動画を変更 ..." />

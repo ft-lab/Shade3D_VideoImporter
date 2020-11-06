@@ -15,10 +15,11 @@ enum {
 	dlg_info_frame_rate = 105,						// フレームレート.
 
 	dlg_loop = 201,									// ループ再生.
-	dlg_color = 202,								// 動画を再生しないときの色.
-	dlg_start_frame = 203,							// 開始フレーム.
-	dlg_use_end_frame = 204,						// 終了フレームを使用.
-	dlg_end_frame = 205,							// 終了フレーム.
+	dlg_useColor = 202,								// 動画を再生しないフレームで色を指定.
+	dlg_color = 203,								// 動画を再生しないときの色.
+	dlg_start_frame = 204,							// 開始フレーム.
+	dlg_use_end_frame = 205,						// 終了フレームを使用.
+	dlg_end_frame = 206,							// 終了フレーム.
 
 	dlg_changeFile = 302,							// 変更ボタン.
 
@@ -325,6 +326,12 @@ bool CVideoImageAttributeInterface::respond (sxsdk::dialog_interface &d, sxsdk::
 		m_data.playLoop = item.get_bool();
 		return true;
 	}
+	if (id == dlg_useColor) {
+		m_data.useColor = item.get_bool();
+		load_dialog_data(d);
+		return true;
+	}
+
 	if (id == dlg_color) {
 		m_data.color = item.get_rgb();
 		return true;
@@ -358,8 +365,15 @@ void CVideoImageAttributeInterface::load_dialog_data (sxsdk::dialog_interface &d
 	}
 	{
 		sxsdk::dialog_item_class* item;
+		item = &(d.get_dialog_item(dlg_useColor));
+		item->set_bool(m_data.useColor);
+	}
+
+	{
+		sxsdk::dialog_item_class* item;
 		item = &(d.get_dialog_item(dlg_color));
 		item->set_rgb(m_data.color);
+		item->set_enabled(m_data.useColor);
 	}
 	{
 		sxsdk::dialog_item_class* item;

@@ -22,6 +22,7 @@ namespace VideoData {
 		float frameRate;				// フレームレート.
 
 		bool playLoop;					// ループ再生.
+		bool useColor;					// 動画を再生しないフレームで色を指定.
 		sxsdk::rgb_class color;			// 動画を再生しないときの色.
 		float startFrame;				// 開始フレーム.
 		float endFrame;					// 終了.
@@ -41,6 +42,7 @@ namespace VideoData {
 			this->frameRate  = v.frameRate;
 
 			this->playLoop    = v.playLoop;
+			this->useColor    = v.useColor;
 			this->color       = v.color;
 			this->startFrame  = v.startFrame;
 			this->endFrame    = v.endFrame;
