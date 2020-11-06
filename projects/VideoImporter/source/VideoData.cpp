@@ -19,7 +19,12 @@ CVideoData::CVideoData (const CVideoData& v)
 	this->height     = v.height;
 	this->frameCount = v.frameCount;
 	this->frameRate  = v.frameRate;
-	this->playLoop   = v.playLoop;
+
+	this->playLoop    = v.playLoop;
+	this->color       = v.color;
+	this->startFrame  = v.startFrame;
+	this->endFrame    = v.endFrame;
+	this->useEndFrame = v.useEndFrame;
 }
 
 CVideoData::~CVideoData ()
@@ -34,4 +39,8 @@ void CVideoData::clear ()
 	frameCount = 0;
 	frameRate = 0.0f;
 	playLoop = false;
+	color = sxsdk::rgb_class(0, 0, 0);
+	startFrame  = 0.0f;
+	endFrame    = 300.0f;
+	useEndFrame = false;
 }

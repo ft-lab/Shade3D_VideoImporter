@@ -15,7 +15,12 @@ enum {
 	dlg_info_frame_rate = 105,						// フレームレート.
 
 	dlg_loop = 201,									// ループ再生.
-	dlg_changeFile = 202,							// 変更ボタン.
+	dlg_color = 202,								// 動画を再生しないときの色.
+	dlg_start_frame = 203,							// 開始フレーム.
+	dlg_use_end_frame = 204,						// 終了フレームを使用.
+	dlg_end_frame = 205,							// 終了フレーム.
+
+	dlg_changeFile = 302,							// 変更ボタン.
 
 };
 
@@ -54,7 +59,7 @@ bool CVideoImageAttributeInterface::ask_shape (sxsdk::shape_class &shape, void *
 
 	// 動画情報をOpenCV経由で読み込み.
 	CImportVideoWithOpenCV importVideo(shade);
-	if (importVideo.init(m_data.fileName, false)) {
+	if (importVideo.init(m_data.fileName, m_data, false)) {
 		m_data.fileName   = importVideo.getFilePath();
 		m_data.width      = importVideo.getWidth();
 		m_data.height     = importVideo.getHeight();
@@ -118,6 +123,15 @@ void CVideoImageAttributeInterface::pre_rendering (bool &b, sxsdk::rendering_con
 	compointer<sxsdk::scene_interface> scene(rendering_context->get_scene_interface());
 	const float curFPS   = (float)(scene->get_frame_rate());
 
+	if (!m_renderingF) {
+		m_passTimeMS = scene->get_current_time();
+
+		// マスターイメージから動画属性を持つ場合の情報をリストに格納.
+		m_storeVideoMasterImage(scene);
+
+		m_renderingF = true;
+	}
+
 	// 画像を更新.
 	bool updateF = false;
 	for (size_t i = 0; i < m_videoList.size(); ++i) {
@@ -155,27 +169,6 @@ void CVideoImageAttributeInterface::pre_rendering (bool &b, sxsdk::rendering_con
 }
 
 /**
- * 各フレームごとのレンダリング開始前に呼ばれる.
- * ここではマスターイメージパートが呼ばれる.
- * ※ このコールバックは、はじめのpre_renderingの後に呼ばれる.
- */
-void CVideoImageAttributeInterface::create_rendering_objects (bool &b, sxsdk::shape_class &shape, sxsdk::scene_interface &scene, void *)
-{
-	if (!m_renderingF) {
-		m_passTimeMS = scene.get_current_time();
-
-		// マスターイメージから動画属性を持つ場合の情報をリストに格納.
-		m_storeVideoMasterImage(&scene);
-
-		char szStr[256];
-		sprintf(szStr, "videos %d", (int)m_videoList.size());
-		shade.message(szStr);
-
-		m_renderingF = true;
-	}
-}
-
-/**
  * m_videoListをクリア.
  */
 void CVideoImageAttributeInterface::m_clearVideoList ()
@@ -207,7 +200,7 @@ void CVideoImageAttributeInterface::m_storeVideoMasterImage (sxsdk::scene_interf
 			if (!StreamCtrl::loadVideoData(*pS, videoD)) continue;
 			m_videoList.push_back(new CImportVideoWithOpenCV(shade));
 			CImportVideoWithOpenCV* importVideo = m_videoList.back();
-			if (!importVideo->init(videoD.fileName)) {
+			if (!importVideo->init(videoD.fileName, videoD, false)) {
 				delete m_videoList[m_videoList.size() - 1];
 				m_videoList.pop_back();
 				{
@@ -220,7 +213,6 @@ void CVideoImageAttributeInterface::m_storeVideoMasterImage (sxsdk::scene_interf
 				}
 
 			} else {
-				importVideo->setLoop(videoD.playLoop);
 				importVideo->pMasterImage = pS;
 
 				const int vWidth  = importVideo->getWidth();
@@ -333,6 +325,23 @@ bool CVideoImageAttributeInterface::respond (sxsdk::dialog_interface &d, sxsdk::
 		m_data.playLoop = item.get_bool();
 		return true;
 	}
+	if (id == dlg_color) {
+		m_data.color = item.get_rgb();
+		return true;
+	}
+	if (id == dlg_start_frame) {
+		m_data.startFrame = item.get_float();
+		return true;
+	}
+	if (id == dlg_end_frame) {
+		m_data.endFrame = item.get_float();
+		return true;
+	}
+	if (id == dlg_use_end_frame) {
+		m_data.useEndFrame = item.get_bool();
+		load_dialog_data(d);
+		return true;
+	}
 
 	return false;
 }
@@ -346,6 +355,27 @@ void CVideoImageAttributeInterface::load_dialog_data (sxsdk::dialog_interface &d
 		sxsdk::dialog_item_class* item;
 		item = &(d.get_dialog_item(dlg_loop));
 		item->set_bool(m_data.playLoop);
+	}
+	{
+		sxsdk::dialog_item_class* item;
+		item = &(d.get_dialog_item(dlg_color));
+		item->set_rgb(m_data.color);
+	}
+	{
+		sxsdk::dialog_item_class* item;
+		item = &(d.get_dialog_item(dlg_start_frame));
+		item->set_float(m_data.startFrame);
+	}
+	{
+		sxsdk::dialog_item_class* item;
+		item = &(d.get_dialog_item(dlg_end_frame));
+		item->set_float(m_data.endFrame);
+		item->set_enabled(m_data.useEndFrame);
+	}
+	{
+		sxsdk::dialog_item_class* item;
+		item = &(d.get_dialog_item(dlg_use_end_frame));
+		item->set_bool(m_data.useEndFrame);
 	}
 
 	{

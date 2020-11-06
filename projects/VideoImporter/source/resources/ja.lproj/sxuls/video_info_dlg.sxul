@@ -8,6 +8,13 @@
 		<long-text id="105" label="フレームレート : " editable="false" short_text="true" lines="1" />
 	</group>
 
-	<bool id="201" label="ループ再生" />
-	<push-button id="202" label="変更 ..." />
+	<group label="オプション">
+		<bool id="201" label="ループ再生" />
+		<rgb id="202" label="動画を再生しないときの色" />
+		<float id="203" label="開始フレーム" />
+		<bool id="204" label="終了フレームを使用" />
+		<float id="205" label="終了フレーム" />
+	</group>
+
+	<push-button id="302" label="動画を変更 ..." />
 </dialog>

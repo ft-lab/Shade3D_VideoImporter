@@ -57,11 +57,6 @@ private:
 	virtual void pre_rendering (bool &b, sxsdk::rendering_context_interface *rendering_context, void *);
 
 	/**
-	 * 各フレームごとのレンダリング開始前に呼ばれる.
-	 */
-	virtual void create_rendering_objects (bool &b, sxsdk::shape_class &shape, sxsdk::scene_interface &scene, void *);
-
-	/**
 	 * アイドル時に定期的に呼ばれる.
 	 */
 	virtual void idle_task (bool &b, sxsdk::scene_interface *scene, void *aux=0);

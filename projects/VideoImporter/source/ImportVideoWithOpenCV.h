@@ -5,6 +5,7 @@
 #define _IMPORT_MOVIE_H
 
 #include "GlobalHeader.h"
+#include "VideoData.h"
 
 #include "opencv2/videoio.hpp"
 #include "opencv2/core.hpp"
@@ -21,7 +22,6 @@ private:
 	int m_frameCount;									// 総フレーム数.
 	double m_fps;										// FPS.
 	int m_currentFrame;									// 読み込んだフレーム数.
-	bool m_loop;										// ループ再生を行う場合.
 
 	std::string m_filePath;								// ファイルのフルパス.
 	std::string m_fileExtension;						// ファイル拡張子 (小文字).
@@ -29,6 +29,9 @@ private:
 	sxsdk::image_interface* m_image;					// 読み込んだ画像を保持.
 
 	bool m_readExit;									// フレーム情報の読み込み終了.
+
+	VideoData::CVideoData m_videoData;					// 動画情報.
+	bool m_fillImageF;									// m_imageを単色で塗りつぶしている場合.
 
 public:
 	sxsdk::shape_class* pMasterImage;					// 対応するマスターイメージの参照.
@@ -39,6 +42,11 @@ private:
 	 * 1フレームを読み込んでm_imageに画像を格納.
 	 */
 	bool m_storeImage ();
+
+	/**
+	 * m_image内を指定の色でクリア.
+	 */
+	void m_fillImage (const sxsdk::rgb_class& col);
 
 public:
 	CImportVideoWithOpenCV (sxsdk::shade_interface& shade);
@@ -68,11 +76,6 @@ public:
 	double getFPS () const { return m_fps; }
 
 	/**
-	 * ループ再生を行うか.
-	 */
-	void setLoop (const bool b);
-
-	/**
 	 * 動画の1フレーム目を取得.
 	 */
 	sxsdk::image_interface* getImage () { return m_image; }
@@ -81,7 +84,7 @@ public:
 	 * 初期化処理.
 	 * @param[in]  fileName   ファイル名。拡張子はmp4であること.
 	 */
-	bool init (const std::string& fileName, const bool readFirstFrame = true);
+	bool init (const std::string& fileName, const VideoData::CVideoData& videoData, const bool readFirstFrame = true);
 
 	/**
 	 * 破棄処理.

@@ -8,21 +8,6 @@
 #include <iostream>
 
 /**
- * マスターイメージパートに対して、rendering_objectsの属性を割り当て.
- */
-void StreamCtrl::setRenderingObjectsAttr (sxsdk::shape_class& masterImagePart)
-{
-	try {
-		// マスターイメージはrendering_objects で呼ばれるようにしている.
-		compointer<sxsdk::stream_interface> stream(masterImagePart.create_attribute_stream_interface_with_uuid(VIDEO_IMAGE_ATTRIBUTE_ID, 
-			sxsdk::uuid_from_pluginid(0), sxsdk::uuid_from_pluginid(0), VIDEO_IMAGE_ATTRIBUTE_ID));
-		if (!stream) return;
-		stream->set_pointer(0);
-		stream->set_size(0);
-	} catch (...) { }
-}
-
-/**
  * Importダイアログボックスの情報を保存.
  */
 void StreamCtrl::saveVideoData (sxsdk::shape_class& shape, const VideoData::CVideoData& data)
@@ -45,6 +30,15 @@ void StreamCtrl::saveVideoData (sxsdk::shape_class& shape, const VideoData::CVid
 
 		iDat = data.playLoop ? 1 : 0;
 		stream->write_int(iDat);
+
+		iDat = data.useEndFrame ? 1 : 0;
+		stream->write_int(iDat);
+
+		stream->write_float(data.color.red);
+		stream->write_float(data.color.green);
+		stream->write_float(data.color.blue);
+		stream->write_float(data.startFrame);
+		stream->write_float(data.endFrame);
 
 		stream->set_label("[Video]");
 	} catch (...) { }
@@ -72,6 +66,15 @@ bool StreamCtrl::loadVideoData (sxsdk::shape_class& shape, VideoData::CVideoData
 
 		stream->read_int(iDat);
 		data.playLoop = iDat ? true : false;
+
+		stream->read_int(iDat);
+		data.useEndFrame = iDat ? true : false;
+
+		stream->read_float(data.color.red);
+		stream->read_float(data.color.green);
+		stream->read_float(data.color.blue);
+		stream->read_float(data.startFrame);
+		stream->read_float(data.endFrame);
 
 		return true;
 

@@ -28,20 +28,22 @@ void CImportVideoWithOpenCV::clear ()
 	m_currentFrame = 0;
 	m_readExit = false;
 	pMasterImage = NULL;
-	m_loop = false;
 	m_filePath = "";
 	m_fileExtension = "";
+	m_videoData.clear();
+	m_fillImageF = false;
 }
 
 /**
  * 初期化処理.
  * @param[in]  fileName   ファイル名。拡張子はmp4であること.
  */
-bool CImportVideoWithOpenCV::init (const std::string& fileName, const bool readFirstFrame)
+bool CImportVideoWithOpenCV::init (const std::string& fileName, const VideoData::CVideoData& videoData, const bool readFirstFrame)
 {
 	clear();
 	m_video.reset(new cv::VideoCapture());
 
+	m_videoData = videoData;
 	m_filePath = fileName;
 	m_video->open(m_filePath);
 	if (m_video->isOpened() == false) {
@@ -88,14 +90,6 @@ bool CImportVideoWithOpenCV::init (const std::string& fileName, const bool readF
 }
 
 /**
- * ループ再生を行うか.
- */
-void CImportVideoWithOpenCV::setLoop (const bool b)
-{
-	m_loop = b;
-}
-
-/**
  * 破棄処理.
  */
 void CImportVideoWithOpenCV::term ()
@@ -114,7 +108,7 @@ bool CImportVideoWithOpenCV::m_storeImage ()
 
 	// ループ再生時は、はじめのフレームに戻る.
 	const int curFramePos = m_video->get(cv::CAP_PROP_POS_FRAMES);
-	if (m_loop) {
+	if (m_videoData.playLoop) {
 		if (curFramePos + 1 >= m_frameCount) {
 			m_video->set(cv::CAP_PROP_POS_FRAMES, 0);
 		}
@@ -176,7 +170,32 @@ bool CImportVideoWithOpenCV::m_storeImage ()
 		return false;
 	}
 
+	m_fillImageF = false;
 	return true;
+}
+
+/**
+ * m_image内を指定の色でクリア.
+ */
+void CImportVideoWithOpenCV::m_fillImage (const sxsdk::rgb_class& col)
+{
+	if (!m_video) return;
+	if (m_width == 0 || m_height == 0) return;
+	if (m_fillImageF) return;
+
+	if (!m_image) {
+		m_image = shade.create_image_interface(sx::vec<int,2>(m_width, m_height));
+	}
+
+	std::vector<sxsdk::rgba_class> lines;
+	lines.resize(m_width, sxsdk::rgba_class(m_videoData.color.red, m_videoData.color.green, m_videoData.color.blue, 1.0f));
+
+	for (int y = 0; y < m_height; ++y) {
+		m_image->set_pixels_rgba_float(0, y, m_width, 1, &(lines[0]));
+	}
+	m_image->update();
+
+	m_fillImageF = true;
 }
 
 /**
@@ -189,8 +208,24 @@ sxsdk::image_interface* CImportVideoWithOpenCV::readImage (const float frame, co
 	if (updateF) *updateF = false;
 	if (m_readExit) return m_image;
 
+	// 開始フレームよりも小さい場合は指定色で塗りつぶす.
+	if (frame < m_videoData.startFrame) {
+		m_fillImage(m_videoData.color);
+		return m_image;
+	}
+
+	// 終了フレームよりも大きい場合は指定色で塗りつぶす.
+	if (m_videoData.useEndFrame) {
+		if (m_videoData.startFrame <= m_videoData.endFrame) {
+			if (frame > m_videoData.endFrame) {
+				m_fillImage(m_videoData.color);
+				return m_image;
+			}
+		}
+	}
+
 	float buffSec = (float)((float)m_currentFrame / m_fps);
-	const float renderSec = (float)(frame / fps);
+	const float renderSec = (float)((frame - m_videoData.startFrame) / fps);
 
 	while (buffSec < renderSec) {
 		if (!m_storeImage()) {

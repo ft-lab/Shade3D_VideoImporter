@@ -58,7 +58,8 @@ sxsdk::image_interface *CVideoImageImporterInterface::do_import (int index, sxsd
 	// 動画を読み込み.
 	// マスターイメージとしての属性割り当ては、do_importから抜けた後に遅延で行っている (idle_task内).
 	m_image = NULL;
-	if (m_importImage.init(m_filePath)) {
+	VideoData::CVideoData videoD;
+	if (m_importImage.init(m_filePath, videoD)) {
 		m_image = m_importImage.getImage();
 		compointer<sxsdk::image_interface> dImage(m_image->duplicate_image());
 		dImage->AddRef();
@@ -86,10 +87,6 @@ void CVideoImageImporterInterface::idle_task (bool &b, sxsdk::scene_interface *s
 			m_importImage.term();
 
 			m_image = NULL;
-
-			// マスターイメージパートに対して、rendering_objectsの属性を割り当て.
-			sxsdk::shape_class* masterImagePart = Shade3DUtil::findMasteImagePart(scene);
-			if (masterImagePart) StreamCtrl::setRenderingObjectsAttr(*masterImagePart);
 		}
 	}
 }

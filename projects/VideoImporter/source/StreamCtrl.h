@@ -19,12 +19,6 @@ namespace StreamCtrl
 	 * Importダイアログボックスの情報を読み込み.
 	 */
 	bool loadVideoData (sxsdk::shape_class& shape, VideoData::CVideoData& data);
-
-	/**
-	 * マスターイメージパートに対して、rendering_objectsの属性を割り当て.
-	 */
-	void setRenderingObjectsAttr (sxsdk::shape_class& masterImagePart);
-
 }
 
 #endif
