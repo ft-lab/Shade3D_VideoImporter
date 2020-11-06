@@ -356,6 +356,9 @@ void CVideoImageAttributeInterface::m_changeVideoFile (sxsdk::dialog_interface &
 
 				// ダイアログの更新.
 				load_dialog_data(d);
+
+			} else {
+				shade.show_message_box(shade.gettext("msg_failed_load_video_file"), false);
 			}
 		}
 	} catch (...) { }
