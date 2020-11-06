@@ -116,7 +116,7 @@ bool CImportVideoWithOpenCV::m_storeImage ()
 	}
 
 	if (m_videoData.playLoop) {
-		if (curFramePos + 1 >= m_frameCount) {
+		if (curFramePos + 1 > m_frameCount) {
 			m_video->set(cv::CAP_PROP_POS_FRAMES, 0);
 		}
 	} else {
