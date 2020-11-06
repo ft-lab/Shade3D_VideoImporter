@@ -24,6 +24,8 @@ private:
 	bool m_renderingF;			// レンダリング中の場合はtrue.
 	sxsdk::rendering_context_interface* m_RC;
 
+	int m_passTimeMS;			// idleのチェック用の経過時間保持用.
+
 private:
 	/**
 	 * SDKのビルド番号を指定（これは固定で変更ナシ）。.

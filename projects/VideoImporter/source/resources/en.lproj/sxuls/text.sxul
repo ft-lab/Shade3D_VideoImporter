@@ -11,4 +11,5 @@
 	<string id="msg_not_master_image" value="マスターイメージではありません。" />
 	<string id="msg_not_video_attribute" value="動画属性が割り当てられていません。" />
 	<string id="msg_not_exist_file" value="指定の動画ファイルは存在しません。" />
+	<string id="msg_different_resolution" value="指定の動画ファイルは、読み込み時と解像度が異なります。" />
 </strings>

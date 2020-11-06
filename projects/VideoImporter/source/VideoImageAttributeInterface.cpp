@@ -15,12 +15,15 @@ enum {
 	dlg_info_frame_rate = 105,						// フレームレート.
 
 	dlg_loop = 201,									// ループ再生.
+	dlg_changeFile = 202,							// 変更ボタン.
+
 };
 
 CVideoImageAttributeInterface::CVideoImageAttributeInterface (sxsdk::shade_interface& shade) : shade(shade)
 {
 	m_renderingF = false;
 	m_RC = NULL;
+	m_passTimeMS = 0;
 }
 
 CVideoImageAttributeInterface::~CVideoImageAttributeInterface ()
@@ -159,6 +162,8 @@ void CVideoImageAttributeInterface::pre_rendering (bool &b, sxsdk::rendering_con
 void CVideoImageAttributeInterface::create_rendering_objects (bool &b, sxsdk::shape_class &shape, sxsdk::scene_interface &scene, void *)
 {
 	if (!m_renderingF) {
+		m_passTimeMS = scene.get_current_time();
+
 		// マスターイメージから動画属性を持つ場合の情報をリストに格納.
 		m_storeVideoMasterImage(&scene);
 
@@ -205,6 +210,15 @@ void CVideoImageAttributeInterface::m_storeVideoMasterImage (sxsdk::scene_interf
 			if (!importVideo->init(videoD.fileName)) {
 				delete m_videoList[m_videoList.size() - 1];
 				m_videoList.pop_back();
+				{
+					std::string msgStr = std::string("[") + std::string(pS->get_name()) + std::string("]");
+					shade.message(msgStr.c_str());
+					msgStr = std::string("  ") + videoD.fileName;
+					shade.message(msgStr.c_str());
+					msgStr = std::string("  ") + shade.gettext("msg_not_exist_file");
+					shade.message(msgStr.c_str());
+				}
+
 			} else {
 				importVideo->setLoop(videoD.playLoop);
 				importVideo->pMasterImage = pS;
@@ -218,6 +232,15 @@ void CVideoImageAttributeInterface::m_storeVideoMasterImage (sxsdk::scene_interf
 				if (sImage && (sImage->get_size().x != vWidth || sImage->get_size().y != vHeight)) {
 					delete m_videoList[m_videoList.size() - 1];
 					m_videoList.pop_back();
+
+					{
+						std::string msgStr = std::string("[") + std::string(pS->get_name()) + std::string("]");
+						shade.message(msgStr.c_str());
+						msgStr = std::string("  ") + videoD.fileName;
+						shade.message(msgStr.c_str());
+						msgStr = std::string("  ") + shade.gettext("msg_different_resolution");
+						shade.message(msgStr.c_str());
+					}
 				}
 			}
 		}
@@ -229,9 +252,17 @@ void CVideoImageAttributeInterface::m_storeVideoMasterImage (sxsdk::scene_interf
  */
 void CVideoImageAttributeInterface::idle_task (bool &b, sxsdk::scene_interface *scene, void *)
 {
+	// チェックは1000ms間隔になるようにする.
+	if (m_renderingF && m_RC) {
+		const int curTime = scene->get_current_time();
+		if (m_passTimeMS > 0 && m_passTimeMS + 1000 > curTime) return;
+		m_passTimeMS = curTime;
+	}
+
 	// レンダリングが終了したときに動画情報をクリアする.
 	try {
 		if (m_renderingF && m_RC) {
+			// sceneを使うのではなく、rendering_contextからのシーンを使う.
 			compointer<sxsdk::scene_interface> scene2(m_RC->get_scene_interface());
 			compointer<sxsdk::rendering_interface> ri(scene2->get_rendering_interface());
 			if (!(ri->is_still_rendering())) {		// レンダリング中でない場合.
@@ -241,6 +272,7 @@ void CVideoImageAttributeInterface::idle_task (bool &b, sxsdk::scene_interface *
 				m_clearVideoList();
 				m_renderingF = false;
 				m_RC = NULL;
+				m_passTimeMS = 0;
 				shade.message("exit rendering.");
 			}
 		}
