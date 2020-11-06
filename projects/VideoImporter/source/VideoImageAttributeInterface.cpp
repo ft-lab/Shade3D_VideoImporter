@@ -30,6 +30,7 @@ CVideoImageAttributeInterface::CVideoImageAttributeInterface (sxsdk::shade_inter
 	m_renderingF = false;
 	m_RC = NULL;
 	m_passTimeMS = 0;
+	m_pCurrentShape = NULL;
 }
 
 CVideoImageAttributeInterface::~CVideoImageAttributeInterface ()
@@ -50,6 +51,8 @@ bool CVideoImageAttributeInterface::ask_shape (sxsdk::shape_class &shape, void *
 		shade.message(shade.gettext("msg_not_video_attribute"));
 		return false;
 	}
+
+	m_pCurrentShape = &shape;
 
 	compointer<sxsdk::dialog_interface> dlg(shade.create_dialog_interface_with_uuid(VIDEO_IMAGE_ATTRIBUTE_ID));
 	dlg->set_resource_name("video_info_dlg");
@@ -99,7 +102,6 @@ bool CVideoImageAttributeInterface::ask_shape (sxsdk::shape_class &shape, void *
 
 	return true;
 }
-
 
 /**
  * コンテキストメニューでのディム指定.
@@ -308,6 +310,58 @@ void CVideoImageAttributeInterface::m_updateFirstImage ()
 }
 
 /**
+ * カレント形状の参照先を変更.
+ */
+void CVideoImageAttributeInterface::m_changeVideoFile (sxsdk::dialog_interface &d)
+{
+	if (!m_pCurrentShape) return;
+
+	try {
+		// 動画ファイルを読み込む.
+		compointer<sxsdk::dialog_interface> dialog(shade.create_dialog_interface());
+#if _WINDOWS
+		const std::string extStr = "mov/mp4/webm (*.mov *.mp4 *.webm)|mov;mp4;webm|mov (*.mov)|mov|mp4 (*.mp4)|mp4|webm (*.webm)|webm";
+#else
+		const std::string extStr = "mp4/webm (*.mp4 *.webm)|mp4;webm|mp4 (*.mp4)|mp4|webm (*.webm)|webm";
+#endif
+
+		std::string fPath(dialog->ask_path(true, extStr.c_str()));
+		if (fPath != "") {
+			CImportVideoWithOpenCV importVideo(shade);
+			if (importVideo.init(fPath, m_data, false)) {
+				m_data.fileName   = importVideo.getFilePath();
+				m_data.width      = importVideo.getWidth();
+				m_data.height     = importVideo.getHeight();
+				m_data.frameCount = importVideo.getFrameCount();
+				m_data.frameRate  = (float)importVideo.getFPS();
+
+				// マスターイメージ内のイメージを入れ替え.
+				sxsdk::master_image_class& masterImage = m_pCurrentShape->get_master_image();
+				sxsdk::image_interface* sImage = masterImage.get_image();
+				if (sImage) {
+					sImage->Release();
+					sImage = NULL;
+				}
+				if (!sImage) {
+					sxsdk::image_interface* firstImage = importVideo.getFirstImage();
+					compointer<sxsdk::image_interface> dImage(firstImage->duplicate_image());
+					dImage->AddRef();
+					masterImage.set_image(dImage);
+
+					const std::string name = StringUtil::getFileName(m_data.fileName);
+					masterImage.set_name(name.c_str());
+
+					StreamCtrl::saveVideoData(*m_pCurrentShape, m_data);
+				}
+
+				// ダイアログの更新.
+				load_dialog_data(d);
+			}
+		}
+	} catch (...) { }
+}
+
+/**
  * ダイアログの初期化.
  */
 void CVideoImageAttributeInterface::initialize_dialog (sxsdk::dialog_interface &d, void *)
@@ -347,6 +401,11 @@ bool CVideoImageAttributeInterface::respond (sxsdk::dialog_interface &d, sxsdk::
 	if (id == dlg_use_end_frame) {
 		m_data.useEndFrame = item.get_bool();
 		load_dialog_data(d);
+		return true;
+	}
+
+	if (id == dlg_changeFile) {
+		m_changeVideoFile(d);
 		return true;
 	}
 

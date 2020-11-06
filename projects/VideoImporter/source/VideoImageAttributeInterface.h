@@ -23,6 +23,7 @@ private:
 
 	bool m_renderingF;			// レンダリング中の場合はtrue.
 	sxsdk::rendering_context_interface* m_RC;
+	sxsdk::shape_class* m_pCurrentShape;	// 属性表示時のカレント形状.
 
 	int m_passTimeMS;			// idleのチェック用の経過時間保持用.
 
@@ -94,6 +95,11 @@ private:
 	 * すべての動画用のマスターイメージをはじめのフレームに戻す.
 	 */
 	void m_updateFirstImage ();
+
+	/**
+	 * カレント形状の参照先を変更.
+	 */
+	void m_changeVideoFile (sxsdk::dialog_interface &d);
 
 public:
 	CVideoImageAttributeInterface (sxsdk::shade_interface& shade);
