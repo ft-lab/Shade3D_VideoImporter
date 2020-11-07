@@ -28,9 +28,6 @@
     <ClCompile Include="..\source\VideoImageImporterInterface.cpp">
       <Filter>mysources</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\VideoLoader.cpp">
-      <Filter>mysources</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\VideoImageAttributeInterface.cpp">
       <Filter>mysources</Filter>
     </ClCompile>
@@ -56,9 +53,6 @@
       <Filter>mysources</Filter>
     </ClInclude>
     <ClInclude Include="..\source\VideoImageImporterInterface.h">
-      <Filter>mysources</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\VideoLoader.h">
       <Filter>mysources</Filter>
     </ClInclude>
     <ClInclude Include="..\source\VideoImageAttributeInterface.h">

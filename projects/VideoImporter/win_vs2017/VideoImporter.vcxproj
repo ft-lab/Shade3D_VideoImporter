@@ -285,7 +285,6 @@
     <ClCompile Include="..\source\VideoImageImporterInterface.cpp" />
     <ClCompile Include="..\source\Shade3DUtil.cpp" />
     <ClCompile Include="..\source\StreamCtrl.cpp" />
-    <ClCompile Include="..\source\VideoLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\GlobalHeader.h" />
@@ -296,7 +295,6 @@
     <ClInclude Include="..\source\VideoImageImporterInterface.h" />
     <ClInclude Include="..\source\Shade3DUtil.h" />
     <ClInclude Include="..\source\StreamCtrl.h" />
-    <ClInclude Include="..\source\VideoLoader.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
