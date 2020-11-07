@@ -165,10 +165,6 @@ void CVideoImageAttributeInterface::pre_rendering (bool &b, sxsdk::rendering_con
 		}
 		image->update();
 	}
-
-	char szStr[256];
-	sprintf(szStr, "pre_rendering %f updateF = %d", curFrame, updateF);
-	shade.message(szStr);
 }
 
 /**
@@ -268,7 +264,6 @@ void CVideoImageAttributeInterface::idle_task (bool &b, sxsdk::scene_interface *
 				m_renderingF = false;
 				m_RC = NULL;
 				m_passTimeMS = 0;
-				shade.message("exit rendering.");
 			}
 		}
 

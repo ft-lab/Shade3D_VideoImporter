@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <strings>
-	<string id="product_name" value="Movie Importer"/>
+	<string id="product_name" value="Video Importer"/>
 	<string id="author" value="ft-lab."/>
 	<string id="company" value="ft-lab."/>
-	<string id="comments" value="Movie Importer (mp4/webm)"/>
+	<string id="comments" value="Video Importer (mp4/webm)"/>
 
 	<string id="movie_image_importer_title" value="mp4"/>
-	<string id="movie_image_attribute_title" value="動画情報 ..."/>
+	<string id="movie_image_attribute_title" value="Video infomation ..."/>
 
-	<string id="msg_not_master_image" value="マスターイメージではありません。" />
-	<string id="msg_not_video_attribute" value="動画属性が割り当てられていません。" />
-	<string id="msg_not_exist_file" value="指定の動画ファイルは存在しません。" />
-	<string id="msg_different_resolution" value="指定の動画ファイルは、読み込み時と解像度が異なります。" />
-	<string id="msg_failed_load_video_file" value="動画ファイルの読み込みに失敗しました。" />
+	<string id="msg_not_master_image" value="Not a master image." />
+	<string id="msg_not_video_attribute" value="No video attributes have been assigned." />
+	<string id="msg_not_exist_file" value="The video file does not exist." />
+	<string id="msg_different_resolution" value="The resolution of the video file is different from that when it is read." />
+	<string id="msg_failed_load_video_file" value="Failed to read the video file." />
 </strings>

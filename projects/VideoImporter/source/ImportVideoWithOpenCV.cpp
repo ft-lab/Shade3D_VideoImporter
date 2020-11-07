@@ -166,7 +166,6 @@ bool CImportVideoWithOpenCV::m_storeImage ()
 
 	} else if (type == CV_8UC4) {
 		const int widSize = m_width * 4;
-
 		for (int y = 0; y < m_height; ++y) {
 			int iPos2 = iPos;
 			for (int x = 0; x < m_width; ++x) {

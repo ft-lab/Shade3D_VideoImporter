@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<dialog default_button="false" title="動画情報">
-	<group label="動画情報">
-		<long-text id="101" label="イメージ名 : " editable="false" short_text="true" lines="1" />
-		<long-text id="102" label="ファイルパス : " editable="false" lines="5" />
-		<long-text id="103" label="サイズ : " editable="false" short_text="true" lines="1" />
-		<long-text id="104" label="フレーム総数 : " editable="false" short_text="true" lines="1" />
-		<long-text id="105" label="フレームレート : " editable="false" short_text="true" lines="1" />
+<dialog default_button="false" title="Video information">
+	<group label="Video information">
+		<long-text id="101" label="Name : " editable="false" short_text="true" lines="1" />
+		<long-text id="102" label="File path : " editable="false" lines="5" />
+		<long-text id="103" label="Size : " editable="false" short_text="true" lines="1" />
+		<long-text id="104" label="Number of frames : " editable="false" short_text="true" lines="1" />
+		<long-text id="105" label="Frame rate : " editable="false" short_text="true" lines="1" />
 	</group>
 
-	<group label="オプション">
-		<bool id="201" label="ループ再生" />
-		<bool id="202" label="動画を再生しないフレームで色を指定" />
-		<rgb id="203" label="色" />
-		<float id="204" label="開始フレーム" />
-		<bool id="205" label="終了フレームを使用" />
-		<float id="206" label="終了フレーム" />
+	<group label="Options">
+		<bool id="201" label="Loop playback" />
+		<bool id="202" label="Use color" />
+		<rgb id="203" label="Color" />
+		<float id="204" label="Start frame" />
+		<bool id="205" label="Use end frame" />
+		<float id="206" label="End frame" />
 	</group>
 
-	<push-button id="302" label="動画を変更 ..." />
+	<push-button id="302" label="Change video file ..." />
 </dialog>
