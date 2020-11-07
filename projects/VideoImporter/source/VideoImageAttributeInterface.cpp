@@ -459,7 +459,8 @@ void CVideoImageAttributeInterface::load_dialog_data (sxsdk::dialog_interface &d
 		item = &(d.get_dialog_item(dlg_info_file_path));
 
 		// 折り返して表示.
-		const std::string filePathWrap = StringUtil::convWrapString(m_data.fileName, 40);
+		const int wrapMaxLen = 70;
+		const std::string filePathWrap = StringUtil::convWrapString(m_data.fileName, wrapMaxLen);
 		item->set_text(filePathWrap.c_str());
 	}
 	{

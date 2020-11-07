@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dialog default_button="false" title="Video information">
 	<group label="Video information">
+		<custom width="450" height="4" />
 		<long-text id="101" label="Name : " editable="false" short_text="true" lines="1" />
 		<long-text id="102" label="File path : " editable="false" lines="5" />
 		<long-text id="103" label="Size : " editable="false" short_text="true" lines="1" />

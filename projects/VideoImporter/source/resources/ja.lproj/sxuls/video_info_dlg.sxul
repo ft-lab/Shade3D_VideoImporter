@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dialog default_button="false" title="動画情報">
 	<group label="動画情報">
+		<custom width="450" height="4" />
 		<long-text id="101" label="イメージ名 : " editable="false" short_text="true" lines="1" />
 		<long-text id="102" label="ファイルパス : " editable="false" lines="5" />
 		<long-text id="103" label="サイズ : " editable="false" short_text="true" lines="1" />
