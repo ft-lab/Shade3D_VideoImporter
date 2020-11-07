@@ -252,6 +252,11 @@ sxsdk::image_interface* CImportVideoWithOpenCV::readImage (const float frame, co
 		}
 	}
 
+	// ループ再生しない場合で、終端のフレーム位置より大きい場合はスキップ.
+	if (!m_videoData.playLoop) {
+		if (m_currentFrame >= m_frameCount) return m_image;
+	}
+
 	// 動画のフレーム位置のm_currentFrameが指定のframe値よりも小さい場合は、.
 	// 動画側のフレーム位置を更新.
 	{
