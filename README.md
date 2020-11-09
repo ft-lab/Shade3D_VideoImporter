@@ -146,7 +146,7 @@ shdファイルの環境を移す場合は、動画ファイルも同一フォ�
 
 ## 開発向け情報
 
-* [他のプラグインからVideo Importerが動画ファイルであるか確認](./dev_other_plugins.md)
+* [他のプラグインから、Video Importerの動画ファイルを確認](./dev_other_plugins.md)
 
 
 ## ライセンス
