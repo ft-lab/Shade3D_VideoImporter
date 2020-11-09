@@ -144,6 +144,11 @@ shdファイルの環境を移す場合は、動画ファイルも同一フォ�
 * [ビルド方法 (Windows)](./build_win.md)
 * [ビルド方法 (Mac)](./build_mac.md)
 
+## 開発向け情報
+
+* [他のプラグインからVideo Importerが動画ファイルであるか確認](./dev_other_plugins.md)
+
+
 ## ライセンス
 
 This software is released under the MIT License, see [LICENSE](./LICENSE).    
